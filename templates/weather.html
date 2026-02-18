@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather - {{ weather.city }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="weather-card">
+            <a href="/" class="back-link">← Back to Search</a>
+            
+            <div class="weather-header">
+                <div class="location">
+                    <h1>{{ weather.city }}, {{ weather.country }}</h1>
+                </div>
+                <div class="icon-large">{{ weather.icon }}</div>
+            </div>
+            
+            <div class="weather-main">
+                <div class="temperature">
+                    <span class="temp-value">{{ weather.temperature }}°C</span>
+                    <span class="description">{{ weather.description }}</span>
+                </div>
+                <div class="feels-like">
+                    Feels like <strong>{{ weather.feels_like }}°C</strong>
+                </div>
+            </div>
+            
+            <div class="weather-details">
+                <div class="detail-item">
+                    <span class="detail-icon">💧</span>
+                    <div>
+                        <p class="detail-label">Humidity</p>
+                        <p class="detail-value">{{ weather.humidity }}%</p>
+                    </div>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-icon">💨</span>
+                    <div>
+                        <p class="detail-label">Wind Speed</p>
+                        <p class="detail-value">{{ weather.wind_speed }} m/s</p>
+                    </div>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-icon">☁️</span>
+                    <div>
+                        <p class="detail-label">Cloudiness</p>
+                        <p class="detail-value">{{ weather.cloudiness }}%</p>
+                    </div>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-icon">🔍</span>
+                    <div>
+                        <p class="detail-label">Pressure</p>
+                        <p class="detail-value">{{ weather.pressure }} hPa</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
