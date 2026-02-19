@@ -9,7 +9,15 @@
 <body>
     <div class="container">
         <div class="weather-card">
-            <a href="/" class="back-link">← Back to Search</a>
+            <div class="weather-card-header">
+                <a href="/" class="back-link">← Back to Search</a>
+                
+                <!-- Temperature Unit Toggle -->
+                <div class="temp-toggle">
+                    <button class="toggle-btn active" data-unit="C" id="btn-celsius">°C</button>
+                    <button class="toggle-btn" data-unit="F" id="btn-fahrenheit">°F</button>
+                </div>
+            </div>
             
             <div class="weather-header">
                 <div class="location">
@@ -61,7 +69,121 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- 5-Day Forecast Section -->
+            {% if weather.forecast %}
+            <div class="forecast-section">
+                <h2>5-Day Forecast</h2>
+                <div class="forecast-grid">
+                    {% for day in weather.forecast %}
+                    <div class="forecast-card">
+                        <div class="forecast-date">{{ day.date }}</div>
+                        <div class="forecast-icon">{{ day.icon }}</div>
+                        <div class="forecast-description">{{ day.description }}</div>
+                        <div class="forecast-temps">
+                            <span class="temp-max">{{ day.temp_max }}°C</span>
+                            <span class="temp-min">{{ day.temp_min }}°C</span>
+                        </div>
+                        {% if day.precipitation %}
+                        <div class="forecast-precip">💧 {{ day.precipitation }}mm</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Temperature Unit Toggle
+        const TEMP_UNIT_KEY = 'weatherAppTempUnit';
+        
+        function celsiusToFahrenheit(celsius) {
+            return Math.round((celsius * 9/5) + 32);
+        }
+        
+        function fahrenheitToCelsius(fahrenheit) {
+            return Math.round((fahrenheit - 32) * 5/9);
+        }
+        
+        function getSavedTempUnit() {
+            return localStorage.getItem(TEMP_UNIT_KEY) || 'C';
+        }
+        
+        function saveTempUnit(unit) {
+            localStorage.setItem(TEMP_UNIT_KEY, unit);
+        }
+        
+        function convertTemperatures(toUnit) {
+            const isCelsius = toUnit === 'C';
+            
+            // Main temperature
+            const tempValue = document.querySelector('.temp-value');
+            if (tempValue) {
+                const currentTemp = parseInt(tempValue.textContent);
+                const converted = isCelsius ? currentTemp : celsiusToFahrenheit(currentTemp);
+                tempValue.textContent = converted + '°' + toUnit;
+            }
+            
+            // Feels like temperature
+            const feelsLike = document.querySelector('.feels-like');
+            if (feelsLike) {
+                const currentText = feelsLike.textContent;
+                const match = currentText.match(/(-?\d+)/);
+                if (match) {
+                    const currentTemp = parseInt(match[1]);
+                    const converted = isCelsius ? currentTemp : celsiusToFahrenheit(currentTemp);
+                    feelsLike.innerHTML = 'Feels like <strong>' + converted + '°' + toUnit + '</strong>';
+                }
+            }
+            
+            // Forecast temperatures
+            const forecastCards = document.querySelectorAll('.forecast-card');
+            forecastCards.forEach(card => {
+                const tempMax = card.querySelector('.temp-max');
+                const tempMin = card.querySelector('.temp-min');
+                
+                if (tempMax) {
+                    const currentMax = parseInt(tempMax.textContent);
+                    const convertedMax = isCelsius ? currentMax : celsiusToFahrenheit(currentMax);
+                    tempMax.textContent = convertedMax + '°' + toUnit;
+                }
+                
+                if (tempMin) {
+                    const currentMin = parseInt(tempMin.textContent);
+                    const convertedMin = isCelsius ? currentMin : celsiusToFahrenheit(currentMin);
+                    tempMin.textContent = convertedMin + '°' + toUnit;
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUnit = getSavedTempUnit();
+            
+            // Set up toggle buttons
+            document.getElementById('btn-celsius').addEventListener('click', function() {
+                document.getElementById('btn-celsius').classList.add('active');
+                document.getElementById('btn-fahrenheit').classList.remove('active');
+                saveTempUnit('C');
+                convertTemperatures('C');
+            });
+            
+            document.getElementById('btn-fahrenheit').addEventListener('click', function() {
+                document.getElementById('btn-fahrenheit').classList.add('active');
+                document.getElementById('btn-celsius').classList.remove('active');
+                saveTempUnit('F');
+                convertTemperatures('F');
+            });
+            
+            // Apply saved preference on load
+            if (savedUnit === 'F') {
+                document.getElementById('btn-fahrenheit').classList.add('active');
+                document.getElementById('btn-celsius').classList.remove('active');
+                convertTemperatures('F');
+            }
+        });
+    </script>
 </body>
 </html>

@@ -76,7 +76,8 @@ def get_weather():
         weather_params = {
             'latitude': latitude,
             'longitude': longitude,
-            'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,cloud_cover',
+            'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,cloud_cover,pressure_msl',
+            'daily': 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum',
             'temperature_unit': 'celsius',
             'wind_speed_unit': 'ms',
             'timezone': 'auto'
@@ -86,6 +87,7 @@ def get_weather():
         weather_data = weather_response.json()
         
         current = weather_data['current']
+        daily = weather_data.get('daily', {})
         
         # Map WMO weather code to description
         wmo_code = current['weather_code']
@@ -126,7 +128,23 @@ def get_weather():
             'description': weather_descriptions.get(wmo_code, 'Unknown'),
             'icon': WEATHER_ICONS.get(wmo_code, '🌤️'),
             'cloudiness': current['cloud_cover'],
+            'pressure': round(current.get('pressure_msl', 0)),
+            'forecast': []
         }
+        
+        # Build 5-day forecast
+        if daily and 'time' in daily:
+            for i in range(min(5, len(daily['time']))):
+                day_code = daily['weather_code'][i]
+                forecast_day = {
+                    'date': daily['time'][i],
+                    'temp_max': round(daily['temperature_2m_max'][i]),
+                    'temp_min': round(daily['temperature_2m_min'][i]),
+                    'description': weather_descriptions.get(day_code, 'Unknown'),
+                    'icon': WEATHER_ICONS.get(day_code, '🌤️'),
+                    'precipitation': daily.get('precipitation_sum', [None] * len(daily['time']))[i]
+                }
+                weather_info['forecast'].append(forecast_day)
         
         return render_template('weather.html', weather=weather_info)
     
