@@ -61,6 +61,29 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- 5-Day Forecast Section -->
+            {% if weather.forecast %}
+            <div class="forecast-section">
+                <h2>5-Day Forecast</h2>
+                <div class="forecast-grid">
+                    {% for day in weather.forecast %}
+                    <div class="forecast-card">
+                        <div class="forecast-date">{{ day.date }}</div>
+                        <div class="forecast-icon">{{ day.icon }}</div>
+                        <div class="forecast-description">{{ day.description }}</div>
+                        <div class="forecast-temps">
+                            <span class="temp-max">{{ day.temp_max }}°C</span>
+                            <span class="temp-min">{{ day.temp_min }}°C</span>
+                        </div>
+                        {% if day.precipitation %}
+                        <div class="forecast-precip">💧 {{ day.precipitation }}mm</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </body>
