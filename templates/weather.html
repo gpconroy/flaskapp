@@ -28,10 +28,10 @@
             
             <div class="weather-main">
                 <div class="temperature">
-                    <span class="temp-value">{{ weather.temperature }}°C</span>
+                    <span class="temp-value" data-celsius="{{ weather.temperature }}">{{ weather.temperature }}°C</span>
                     <span class="description">{{ weather.description }}</span>
                 </div>
-                <div class="feels-like">
+                <div class="feels-like" data-celsius="{{ weather.feels_like }}">
                     Feels like <strong>{{ weather.feels_like }}°C</strong>
                 </div>
             </div>
@@ -81,8 +81,8 @@
                         <div class="forecast-icon">{{ day.icon }}</div>
                         <div class="forecast-description">{{ day.description }}</div>
                         <div class="forecast-temps">
-                            <span class="temp-max">{{ day.temp_max }}°C</span>
-                            <span class="temp-min">{{ day.temp_min }}°C</span>
+                            <span class="temp-max" data-celsius="{{ day.temp_max }}">{{ day.temp_max }}°C</span>
+                            <span class="temp-min" data-celsius="{{ day.temp_min }}">{{ day.temp_min }}°C</span>
                         </div>
                         {% if day.precipitation %}
                         <div class="forecast-precip">💧 {{ day.precipitation }}mm</div>
@@ -118,42 +118,38 @@
         
         function convertTemperatures(toUnit) {
             const isCelsius = toUnit === 'C';
-            
+
             // Main temperature
             const tempValue = document.querySelector('.temp-value');
             if (tempValue) {
-                const currentTemp = parseInt(tempValue.textContent);
-                const converted = isCelsius ? currentTemp : celsiusToFahrenheit(currentTemp);
+                const celsiusTemp = parseInt(tempValue.dataset.celsius);
+                const converted = isCelsius ? celsiusTemp : celsiusToFahrenheit(celsiusTemp);
                 tempValue.textContent = converted + '°' + toUnit;
             }
-            
+
             // Feels like temperature
             const feelsLike = document.querySelector('.feels-like');
             if (feelsLike) {
-                const currentText = feelsLike.textContent;
-                const match = currentText.match(/(-?\d+)/);
-                if (match) {
-                    const currentTemp = parseInt(match[1]);
-                    const converted = isCelsius ? currentTemp : celsiusToFahrenheit(currentTemp);
-                    feelsLike.innerHTML = 'Feels like <strong>' + converted + '°' + toUnit + '</strong>';
-                }
+                const celsiusTemp = parseInt(feelsLike.dataset.celsius);
+                const converted = isCelsius ? celsiusTemp : celsiusToFahrenheit(celsiusTemp);
+                feelsLike.innerHTML = 'Feels like <strong>' + converted + '°' + toUnit + '</strong>';
             }
-            
+
             // Forecast temperatures
             const forecastCards = document.querySelectorAll('.forecast-card');
             forecastCards.forEach(card => {
                 const tempMax = card.querySelector('.temp-max');
                 const tempMin = card.querySelector('.temp-min');
-                
+
                 if (tempMax) {
-                    const currentMax = parseInt(tempMax.textContent);
-                    const convertedMax = isCelsius ? currentMax : celsiusToFahrenheit(currentMax);
+                    const celsiusMax = parseInt(tempMax.dataset.celsius);
+                    const convertedMax = isCelsius ? celsiusMax : celsiusToFahrenheit(celsiusMax);
                     tempMax.textContent = convertedMax + '°' + toUnit;
                 }
-                
+
                 if (tempMin) {
-                    const currentMin = parseInt(tempMin.textContent);
-                    const convertedMin = isCelsius ? currentMin : celsiusToFahrenheit(currentMin);
+                    const celsiusMin = parseInt(tempMin.dataset.celsius);
+                    const convertedMin = isCelsius ? celsiusMin : celsiusToFahrenheit(celsiusMin);
                     tempMin.textContent = convertedMin + '°' + toUnit;
                 }
             });
