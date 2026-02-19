@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+layout.png
+.env
+.env.local
+.venv_backup/
